@@ -8,6 +8,8 @@ from io import BytesIO
 import psycopg2 
 import concurrent.futures
 import urllib.request
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 app = FastAPI()
 CAT_API_BASE = "https://api.thecatapi.com/v1/images/"
@@ -23,50 +25,50 @@ params:
     order: ASCD | DESC | RAND
 """
 def call_cat_api(limit=10, order="RAND"):
-        url = CAT_API_BASE + """search?
-                               limit={LIMIT}
-                               &order={ORDER}
-                               &api_key={CAT_API_KEY}
-                               """.format(LIMIT=limit, ORDER=order, CAT_API_KEY=config["CAT_API_KEY"])
+        url = CAT_API_BASE + """search?limit={LIMIT}&order={ORDER}&api_key={CAT_API_KEY}""".format(LIMIT=limit, ORDER=order, CAT_API_KEY=config["CAT_API_KEY"])
         return requests.get(url, timeout=10)
 
 
-
 """Downloads a hundred images and inserts them inside the images table"""
-
 def get_hundred_random_cats():
-    print("Loading a hundred cats...")
-    cat_count = 0
-    while cat_count < 100:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            future_to_url = {executor.submit(call_cat_api): i for i in range(5)}
-            for future in concurrent.futures.as_completed(future_to_url):
-                url = future_to_url[future]
-                try:
-                    resp = future.result()
-                    cats_needed = min(10, 100-cat_count) #fetch 10 cats, unless > 90
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-                        future_to_url_2 = {executor.submit(download_and_insert_image, i["url"], i["id"], 10): i for i in resp.json()[:cats_needed]}
-                        for future in  concurrent.futures.as_completed(future_to_url_2):
-                            cat_count += 1
-                            if cat_count >= 100:
-                                return cat_count
-                
-                except Exception as exc:
-                    print('%r generated an exception: %s' % (url, exc))
-                else:
-                    print('%r cat count is %d bytes' % (cat_count, len(resp.content)))
+    cats = []
+    while len(cats) < 100:
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            future_cats = {executor.submit(call_cat_api)}
+            for future in concurrent.futures.as_completed(future_cats):
+                 cats += future.result().json()
+                 if len(cats) > 100:
+                      return cats
+    return cats[:100]
 
 
 def download_and_insert_image(url, label, timeout):
     img_binary = requests.get(url, timeout=timeout).content
     insert_image(label, img_binary)  
+
+def download_images_from_list(urls):
+    count = 0
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        future_images = {executor.submit(download_and_insert_image, url) for url in urls}
+        for future in concurrent.futures.as_completed(future_images):
+            count += 1
+            print("Download Image #", count)
+
+start = time.perf_counter()
+
+cats = get_hundred_random_cats()
+
+urls = [i["url"] for i in cats]
         
-create_table()
-print("TOTAL_CATs", get_hundred_random_cats())
+download_images_from_list(urls)
+print(f"Total time: {time.perf_counter() - start}")
+
+
 @app.get("/cats")
 async def leads():
     return get_cats_data()
 
 app.mount("/", StaticFiles(directory="static",html = True), name="static")
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
