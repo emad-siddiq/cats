@@ -1,0 +1,5 @@
+CREATE USER docker WITH PASSWORD 'docker';
+
+CREATE DATABASE images;
+GRANT ALL PRIVILEGES ON DATABASE images TO docker;
+
