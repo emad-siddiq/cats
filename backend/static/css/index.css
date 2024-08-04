@@ -1,5 +1,18 @@
 .cats {
-    width: 400px;
-    height: 400px;
+    width: 50vw;
+    width: 50vh;
+    object-fit: fill;
     background-color: green;
+    overflow: hidden;
+}
+
+.next-arrow {
+    z-index: 10;
+    position: absolute;
+    top: 5vh;
+    left: 80vw;
+    width: 10vw;
+    height: 10vh;
+
+    opacity: 100%;
 }
