@@ -147,7 +147,7 @@ class Carousel {
 }
 function fetchImages(page, limit) {
     return __awaiter(this, void 0, void 0, function* () {
-        const url = 'http://localhost:8000/images?' + 'page=' + page + "&" + "per_page=" + limit;
+        const url = 'http://localhost:8000/cats?' + 'page=' + page + "&" + "per_page=" + limit;
         try {
             const response = yield fetch(url);
             if (!response.ok) {

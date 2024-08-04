@@ -131,7 +131,7 @@ def decode(bytea_data):
     return base64_img
 
 
-def get_paginated_images_from_db(page: int, per_page: int, db_config: Dict = db_config):
+def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_config):
 
     """https://docs.python.org/3/library/base64.html
     """

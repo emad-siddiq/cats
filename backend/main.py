@@ -1,7 +1,7 @@
 import yaml 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image, create_table, get_all_cats, get_cats_from, get_paginated_images_from_db
+from db.database import  insert_image, create_table, get_paginated_cats_from_db
 import concurrent.futures
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -77,14 +77,13 @@ def main():
 main()
 
 
-@app.get("/cats")
-async def cats():
-    return "get_cats"
+
 
 # GET endpoint for paginated images
-@app.get("/images")
-async def get_images(page: int = Query(1, alias="page"), per_page: int = Query(10, alias="per_page")):
-    return get_paginated_images_from_db(page, per_page)
+@app.get("/cats")
+async def get_cats(page: int = Query(1, alias="page"), per_page: int = Query(10, alias="per_page")):
+    return get_paginated_cats_from_db(page, per_page)
+
 
 app.mount("/", StaticFiles(directory="./static",html = True), name="static")
 

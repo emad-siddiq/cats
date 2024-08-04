@@ -17,10 +17,14 @@ class Favorites {
         div.style.top = "10vh";
         div.style.width = "22vw";
         div.style.height = "80vh";
-        div.style.position = "absolute";
-        div.style.backgroundColor = "green";
+        div.style.display = "flex";
+        div.style.flexWrap = "wrap";
+        div.style.flexDirection ="row";
+        div.style.alignContent = "flex-start";
 
-        div.innerText = "Favorites";
+        div.style.position = "absolute";
+        div.style.boxShadow = "0px 2px 15px 0px rgba(0, 0, 0, .1)";
+
         return div;
     }
 
@@ -32,12 +36,17 @@ class Favorites {
         let favImageDiv = document.createElement("div");
         favImageDiv.setAttribute("id", "fav-" + cat.id);
         favImageDiv.setAttribute("class", "fav-" + cat.id);
+        favImageDiv.style.width = "10vw";
+        favImageDiv.style.height = "10vh";
+
 
         var image = new Image();
         image.src = 'data:image/jpg;base64,'+ cat.base64_img;
         image.style.objectFit = "cover";
-        image.style.width = "8vw";
-        image.style.height = "16vh";
+        image.style.width = "100%";
+        image.style.maxHeight ="100%";
+
+        image.style.height = "100%";
         favImageDiv.appendChild(image);
         this.favorites.push(cat.id.toString());
         console.log("Added to Favorites", this.favorites);

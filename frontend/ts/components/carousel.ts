@@ -183,7 +183,7 @@ class Carousel {
 }
 
 async function fetchImages(page: string, limit:string) {
-    const url = 'http://localhost:8000/images?' + 'page=' + page + "&" + "per_page=" + limit;
+    const url = 'http://localhost:8000/cats?' + 'page=' + page + "&" + "per_page=" + limit;
 
     try {
         const response = await fetch(url);
