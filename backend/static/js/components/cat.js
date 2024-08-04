@@ -3,7 +3,6 @@ class Cat {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
-        this.div.addEventListener("dblclick", this.addToFavorites.bind(this));
     }
     createCatImgDiv() {
         var image = new Image();
@@ -15,9 +14,6 @@ class Cat {
         image.style.top = "10vh";
         image.style.left = "2vw";
         return image;
-    }
-    addToFavorites() {
-        console.log("Added to Favorites");
     }
 }
 export { Cat };

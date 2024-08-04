@@ -22,14 +22,32 @@ class Favorites {
         if (this.favorites.indexOf(cat.id.toString()) > -1) {
             return;
         }
-        console.log("Added to Favorites");
+        let favImageDiv = document.createElement("div");
+        favImageDiv.setAttribute("id", "fav-" + cat.id);
+        favImageDiv.setAttribute("class", "fav-" + cat.id);
         var image = new Image();
         image.src = 'data:image/jpg;base64,' + cat.base64_img;
         image.style.objectFit = "cover";
         image.style.width = "8vw";
         image.style.height = "16vh";
+        favImageDiv.appendChild(image);
         this.favorites.push(cat.id.toString());
-        this.div.appendChild(image);
+        console.log("Added to Favorites", this.favorites);
+        this.div.appendChild(favImageDiv);
+    }
+    removeFromFavorites(cat) {
+        var _a;
+        let id = "fav-" + cat.id.toString();
+        console.log("ID TO REMOVE", id, this.favorites.indexOf(cat.id.toString()));
+        let idx = this.favorites.indexOf(cat.id.toString());
+        if (idx === -1) {
+            console.log("Not found in favs");
+            return;
+        }
+        this.favorites.splice(idx, 1);
+        var elem = document.getElementById(id);
+        console.log(elem);
+        (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
     }
 }
 export { Favorites };

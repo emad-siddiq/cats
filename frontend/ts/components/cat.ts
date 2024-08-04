@@ -8,7 +8,6 @@ class Cat {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
-        this.div.addEventListener("dblclick", this.addToFavorites.bind(this));
     }
 
 
@@ -32,9 +31,6 @@ class Cat {
         return image;
     }
     
-    addToFavorites() {
-        console.log("Added to Favorites");
-    }
 
 }
 

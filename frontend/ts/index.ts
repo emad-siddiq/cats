@@ -14,6 +14,11 @@ document.getElementById("add-to-favs").addEventListener("click", () => {
     favorites.addToFavorites(carousel.getCurrentCat());
 })
 
+document.getElementById("remove-from-favs").addEventListener("click", () => {
+
+    favorites.removeFromFavorites(carousel.getCurrentCat());
+})
+
 
 
 // let next_cat = document.getElementById("next-cat");

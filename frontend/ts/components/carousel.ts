@@ -2,6 +2,7 @@ import { Cat } from "./cat.js"
 import { Description } from "./description.js";
 
 class Carousel {
+    id: string
     div: HTMLElement;
     curr_cat_id: number;
     page: number; // The current page in the db
@@ -12,6 +13,7 @@ class Carousel {
     constructor() {
         this.div = this.createCarouselDiv();
         this.page = 1;
+        this.id = "carousel"
         this.per_page = 10;
         this.getNewBatch();
         this.cat_cache = {};
@@ -20,12 +22,12 @@ class Carousel {
 
     getCurrentCat() {
         console.log(this.cat_cache, this.curr_cat_id);
-        return this.cat_cache[this.curr_cat_id];
+        return this.cat_cache[(this.curr_cat_id % 10)];
     }
     createCarouselDiv() {
         let div = document.createElement("div");
-        div.setAttribute("id", "carousel");
-        div.setAttribute("class", "carousel");
+        div.setAttribute("id", this.id);
+        div.setAttribute("class", this.id);
         div.style.boxSizing = "border-box";
         div.style.gridColumn = "1/2";
 
@@ -49,10 +51,10 @@ class Carousel {
         div.setAttribute("class", "next-cat-arrow");
         
         div.style.position = "absolute";
-        div.style.top = "5vh";
-        div.style.left = "40vw";
-        div.style.width = "15vw";
-        div.style.height = "60vh"
+        div.style.top = "10vh";
+        div.style.left = "55vw";
+        div.style.width = "20vw";
+        div.style.height = "80vh"
         div.style.zIndex = "10";
         div.style.boxSizing = "border-box";
         div.style.backgroundColor = "rgb(255, 255, 255, 0.6)";
@@ -65,6 +67,9 @@ class Carousel {
         div.addEventListener("mouseleave", () => {
             div.style.opacity = "0";
         });
+
+        div.addEventListener("click", this.loadNext.bind(this))
+
         let arrow = new Image(100, 100);
         arrow.src = "./img/next-arrow.svg";
         arrow.style.position = "relative";
@@ -85,7 +90,7 @@ class Carousel {
         
         div.style.position = "absolute";
         div.style.top = "5vh";
-        div.style.left = "5vw";
+        div.style.left = "2vw";
         div.style.width = "20vw";
         div.style.height = "90vh"
         div.style.zIndex = "10";
@@ -99,11 +104,14 @@ class Carousel {
         div.addEventListener("mouseleave", () => {
             div.style.opacity = "0";
         });
+
+        div.addEventListener("click", this.loadPrev.bind(this))
+
     
         let arrow = new Image(100, 100);
         arrow.src = "./img/next-arrow.svg";
         arrow.style.position = "relative";
-        arrow.style.top = "50%";
+        arrow.style.top = "45%";
         arrow.style.transform = "scale(-1,1)";
         arrow.style.left = "30%";
 
@@ -114,6 +122,37 @@ class Carousel {
     
     
         return div;
+    }
+
+    loadNext() {
+
+        if (this.curr_cat_id % this.per_page === Object.keys(this.cat_cache).length - 1) {
+            this.getNewBatch();
+            return;
+        }
+        // Remove current cat
+        var elem = document.getElementById(this.curr_cat_id.toString());
+        elem?.parentNode?.removeChild(elem);
+        // Add new cat
+        this.curr_cat_id += 1;
+        console.log(this, this.curr_cat_id, this.cat_cache);
+        this.div.appendChild(this.cat_cache[this.curr_cat_id % 10].div);
+    }
+
+    loadPrev() {
+
+        if (this.curr_cat_id % this.per_page === Object.keys(this.cat_cache).length - 1) {
+            this.page -= 1;
+            this.getNewBatch();
+            return;
+        }
+         // Remove current cat
+         var elem = document.getElementById(this.curr_cat_id.toString());
+         elem?.parentNode?.removeChild(elem);
+         // Add new cat
+         this.curr_cat_id += 1;
+         console.log(this, this.curr_cat_id, this.cat_cache);
+         this.div.appendChild(this.cat_cache[this.curr_cat_id % 10].div);
     }
 
     getNewBatch() {

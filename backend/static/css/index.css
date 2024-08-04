@@ -21,8 +21,15 @@
 
 .add-to-favs {
     position: absolute;
-    top: 10vh;
-    left: 50vw;
+    top: 5vh;
+    left: 58vw;
+    font-size: 30px;
+}
+
+.remove-from-favs {
+    position: absolute;
+    top: 20vh;
+    left: 63vw;
     font-size: 30px;
 }
 
