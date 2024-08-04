@@ -1,7 +1,7 @@
 import yaml 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image, create_table, get_all_cats, get_cats_from
+from db.database import  insert_image, create_table, get_all_cats, get_cats_from, get_paginated_images_from_db
 import concurrent.futures
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -9,14 +9,14 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Dict, Generator
 from math import ceil
-from pagination import get_paginated_images_from_db, PaginatedImagesResponse
 from fastapi import FastAPI, Query, HTTPException
 import requests
+
 
 app = FastAPI()
 CAT_API_BASE = "https://api.thecatapi.com/v1/images/"
 
-with open('./config.yml', 'r') as file:
+with open('./../config.yml', 'r') as file:
     config = yaml.safe_load(file)
 
 print(config["CAT_API_KEY"])
@@ -61,13 +61,20 @@ def download_images(cats):
             insert_image(result[0], result[1])  
 
 
-start = time.perf_counter()
-create_table()
+### MAIN
+def main():
+    print("Start main")
 
-cats = get_hundred_random_cats()
+    start = time.perf_counter()
+    print("Creating table")
+    create_table()
 
-download_images(cats)
-print(f"Total time: {time.perf_counter() - start}")
+    cats = get_hundred_random_cats()
+
+    print(f"Total time: {time.perf_counter() - start}")
+    download_images(cats)
+
+main()
 
 
 @app.get("/cats")
@@ -75,14 +82,13 @@ async def cats():
     return "get_cats"
 
 # GET endpoint for paginated images
-@app.get("/images", response_model=PaginatedImagesResponse)
+@app.get("/images")
 async def get_images(page: int = Query(1, alias="page"), per_page: int = Query(10, alias="per_page")):
     return get_paginated_images_from_db(page, per_page)
 
-app.mount("/", StaticFiles(directory="./backend/static",html = True), name="static")
+app.mount("/", StaticFiles(directory="./static",html = True), name="static")
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
-else: 
-    pass
+
+
+
