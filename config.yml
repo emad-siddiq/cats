@@ -1,0 +1,7 @@
+CAT_API_KEY: "live_zrLPGlaTQlUo0BQQrbyeG5NRQVHmBkJEzQZppRdeKYDBZfomTb1B9EKjYVT8wgs0"
+pg:
+  host: "127.0.0.1"
+  dbname: "images"
+  user: "docker"
+  pwd: "docker"
+  port: "5432"
