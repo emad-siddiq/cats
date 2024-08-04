@@ -1,21 +1,23 @@
 <html>
     <head>
         <link rel="stylesheet" href="./css/index.css">
+        <meta charset="UTF-8">
     </head>
     <body>
-        <h1>Cats</h1>
+        <h1 id="heading" class="heading">Cats</h1>
 
-            <button id="next-cat">Next Cat</button>
-            <button>Previous Cat</button>
-            <button>Reset Cats</button>
-            <img id = "next-arrow" class="next-arrow" src="./img/next-arrow.svg">
+            <button id="next-cat" class="prev-cat">Next Cat</button>
+            <button id="prev-cat" class="prev-cat">Previous Cat</button>
+            <button id="reset-cats" class="reset-cats">Reset Cats</button>
 
-        <div id="cats" class="class">
+        <div id="cats" class="cats">
 
         </div>
-        <button>Add To Favorites</button>
-        <button>Remove From Favorites</button>
-        <button>Edit Cat Data</button>
+
+
+        <button id="add-to-favs" class="add-to-favs"> &#10084; Favorite</button>
+        <button id="remove-from-favs" class="remove-from-favs">&#128148; Remove From Favorites</button>
+        <button id="edit-cat-data" class="edit-cat-data">Edit Cat Data</button>
 
         <select name="catbreeds" id="catbreeds" class="catbreeds">
             <!--TODO: Populate this with JS to -->
