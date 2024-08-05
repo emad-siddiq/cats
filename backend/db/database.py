@@ -246,3 +246,51 @@ def select_by_breed_id(breed):
         cursor.close()
         conn.close()
 
+
+# Pydantic model for request body
+class UpdateTextColumnRequest(BaseModel):
+    id: int
+    new_text: str
+
+def update_other_details(request: UpdateTextColumnRequest):
+    try: 
+        conn = psycopg.connect(**db_config)
+        cursor = conn.cursor()  
+
+        if (len(request.new_text) == 0):
+            return {"message": "Nothing to update"} 
+        # Update query
+        update_query = "UPDATE cats SET other_details = %s WHERE id = %s"
+        cursor.execute(update_query, (request.new_text, request.id))
+        
+        # Commit the transaction
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+        return {"message": "Text column updated successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+def get_single_cat(id: str):
+    try:
+        conn = psycopg.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM cats WHERE id = %s", (id,))
+        item = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if item:
+            return item
+        else:
+            raise HTTPException(status_code=404, detail="Item not found")
+    except Exception as e:
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))

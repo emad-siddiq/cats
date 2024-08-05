@@ -21,9 +21,12 @@ class Favorites {
         div.style.scrollbarColor = "#390 #bada55";
         div.style.position = "absolute";
         div.style.boxShadow = "0px 2px 15px 0px rgba(0, 0, 0, .1)";
-        div.style.fontSize = "40px";
+        div.style.fontSize = "30px";
         div.style.color = "gray";
-        div.innerText = "Favorites\n ... \nDouble click\n  \n on a cat to add it to favorites. \n Double click on it here in favorites to unlike.";
+        div.style.paddingLeft = "10px";
+        div.style.paddingTop = "10px";
+
+        div.innerText = "Favorites\n ... \nDouble click in left to add  \n Double click here to unlike.";
         return div;
     }
     addToFavorites(cat) {

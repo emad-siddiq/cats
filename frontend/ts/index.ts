@@ -4,6 +4,7 @@ import {Carousel} from "./components/carousel.js";
 import { Description } from "./components/description.js";
 import { Favorites } from "./components/favorites.js";
 import { Cat } from "./components/cat.js";
+import { Edit } from "./components/edit.js";
 
 let carousel = new Carousel();
 let favorites = new Favorites();
@@ -49,11 +50,15 @@ document.getElementById("carousel").addEventListener("dblclick", () => {
     carousel.loadNext();
 })
 
-document.getElementById("remove-from-favs").addEventListener("click", () => {
 
-    favorites.removeFromFavorites(carousel.getCurrentCat().id);
-})
 
+
+document.getElementById("edit-cat-data").addEventListener("click", () => {
+    let curr_cat = carousel.getCurrentCat()
+   let edit = new Edit(curr_cat);
+   document.body.append(edit.div);
+
+}) 
 
 async function fetchBreeds() {
     const url = 'http://localhost:8000/breeds';
@@ -103,12 +108,13 @@ async function postBreed(url: string, breed: Breed) {
             carousel.curr_cat_id = 0;
 
             for (let i = 1; i < cats.length+1; i++) {
-                let cat = new Cat((carousel.curr_cat_id+i).toString(),
-                                                cats[i-1]["data"],
-                                                cats[i-1]["breed_id"],
-                                                cats[i-1]["breed_name"],
-                                                cats[i-1]["other_details"]
-                ) 
+                let cat = new Cat(
+                                cats[i-1]["id"],
+                                cats[i-1]["data"],
+                                cats[i-1]["breed_id"],
+                                cats[i-1]["breed_name"],
+                                cats[i-1]["other_details"]
+                                ) 
                 carousel.cat_cache[i] = cat;
             }
             // Remove current cat and replace with first cat from selected breed
@@ -126,8 +132,3 @@ async function postBreed(url: string, breed: Breed) {
         console.error('Error posting item:', error);
     }
 }
-
-
-
-
-

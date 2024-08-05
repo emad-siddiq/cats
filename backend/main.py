@@ -1,7 +1,7 @@
 import yaml 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image, create_table, get_paginated_cats_from_db,select_by_breed_id, get_breeds, decode
+from db.database import  insert_image,get_single_cat, create_table, get_paginated_cats_from_db,select_by_breed_id, get_breeds, decode, update_other_details
 import concurrent.futures
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -119,6 +119,20 @@ main()
 async def get_cats(page: int = Query(1, alias="page"), per_page: int = Query(10, alias="per_page")):
     return get_paginated_cats_from_db(page, per_page)
 
+@app.get("/cats/{id}")
+async def get_cat(id: int):
+    cat = get_single_cat(id)
+    response = {
+                "id": cat[0],
+                "breed_id":cat[1],
+                "breed_name":cat[2],
+                "other_details":cat[3],
+                "data":decode(cat[4])
+            }
+        
+    
+    return response
+
 # Define the request body model
 class Item(BaseModel):
     value: str
@@ -150,6 +164,20 @@ async def create_item(item: Item):
         }
     
     return response
+
+
+# Pydantic model for request body
+class UpdateTextColumnRequest(BaseModel):
+    id: int
+    new_text: str
+
+
+# PUT endpoint to update a text column
+@app.put("/update-other-details")
+def update_other_details_column(request: UpdateTextColumnRequest):
+    
+    return update_other_details(request)
+
 
 
 app.mount("/", StaticFiles(directory="./static",html = True), name="static")

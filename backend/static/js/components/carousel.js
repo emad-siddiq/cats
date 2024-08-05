@@ -144,7 +144,7 @@ class Carousel {
                 console.log(data.keys);
                 let cats = data["cats"];
                 for (let i = 1; i < cats.length + 1; i++) {
-                    let cat = new Cat((this.curr_cat_id + i).toString(), cats[i - 1]["data"], cats[i - 1]["breed_id"], cats[i - 1]["breed_name"], cats[i - 1]["other_details"]);
+                    let cat = new Cat(cats[i-1]["id"], cats[i - 1]["data"], cats[i - 1]["breed_id"], cats[i - 1]["breed_name"], cats[i - 1]["other_details"]);
                     this.cat_cache[i] = cat;
                 }
                 // Set first cat from call as default cat
