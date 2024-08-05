@@ -33,6 +33,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug
 
 Alternatively, `fastapi dev main.py`. 
 
+To make changes to the TypeScript files, `cd into frontend/ts` and run `tsc -w` to watch for changes.
+
 Access the cat app web at `localhost:8000`. You can select your favorites and filter by breeds.
 Allow a few seconds for the application to download images.
 
