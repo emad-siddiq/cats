@@ -114,7 +114,6 @@ async def get_cat(id: int):
 
     return response
 
-# Define the request body model
 
 
 class Item(BaseModel):
@@ -126,13 +125,10 @@ async def breeds():
 
     return get_breeds()
 
-# Define the POST endpoint
-
 
 @app.post("/set_breed/")
 async def create_item(item: Item):
     # Select only images that are of this breed
-
     cats = select_by_breed_id(item.value)
 
     response = {
@@ -150,12 +146,9 @@ async def create_item(item: Item):
     return response
 
 
-# Pydantic model for request body
 class UpdateTextColumnRequest(BaseModel):
     id: int
     new_text: str
-
-# PUT endpoint to update a text column
 
 
 @app.put("/update-other-details")

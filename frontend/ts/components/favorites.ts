@@ -10,6 +10,8 @@ class Favorites {
         this.div = this.createFavoritesDiv();
         this.first_fav = true;
     }  
+    // A div on the right side of the screen to store current session favorites
+
     createFavoritesDiv() {
         let div = document.createElement("div");
         div.setAttribute("id", "favorites");
@@ -35,6 +37,9 @@ class Favorites {
 
         return div;
     }
+
+
+    // Add the current image to favorites div
 
     addToFavorites(cat: Cat) {
         console.log(cat);
@@ -71,6 +76,7 @@ class Favorites {
         this.div.appendChild(favImageDiv);
     }
 
+    // Remove from favorites div by cat id
     removeFromFavorites(cat_id: string) {
         let id = "fav-" + cat_id.toString();
         console.log("ID TO REMOVE", id, this.favorites.indexOf(cat_id.toString()));

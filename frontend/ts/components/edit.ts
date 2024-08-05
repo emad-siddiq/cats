@@ -1,4 +1,8 @@
 import { Cat } from "./cat.js";
+
+// The Edit Menu pops up when the edit button is pressed on a cat image that is in view
+// It allows for the other_detail column of the cats postgres table to be edited from the browser
+
 class Edit {
     div: HTMLElement;
     cat: Cat;
@@ -7,7 +11,7 @@ class Edit {
         this.cat = cat;
         this.div = this.createEditDiv();
     }  
-
+    // Create a Div that pops up in the center of the screen to edit other details of the cat image in focus
     createEditDiv() {
         let div = document.createElement("div");
         div.setAttribute("id", "edit");
@@ -37,6 +41,8 @@ class Edit {
 
         div.innerHTML = `<form onsubmit=\"return false;\"><label for=\"fname\">Edit the Other Details column for cat (see new updated copy from db in description):</label><br><textarea type=\"textarea\" id=\"edit-other-details\" name=\"edit-other-details\" value=\"${this.cat.other_details.slice(1)}\"></textarea><br><input style=\"font-size:24px;\"type=\"submit\" value=\"Submit\">`
         
+
+        // Add a Button to close the Edit window 
         let close = document.createElement("input");
         close.setAttribute("id", "close-edit");
         close.setAttribute("class", "close-edit");
@@ -44,17 +50,16 @@ class Edit {
         close.style.marginLeft = "85%";
         close.style.fontSize = "30px";
         close.value = "Close";
-       
-
         close.addEventListener("click", () => {
             var elem = document.getElementById("edit");
             elem?.parentNode?.removeChild(elem);
         })
         div.appendChild(close);
 
+        // On Submit, update the value 
         div.addEventListener("submit", async () => {
             let val = (<HTMLInputElement>document.getElementById("edit-other-details")).value;
-            updateOtherDetailsColumn(parseInt(this.cat.id), val);
+            // In case of empty submission
             if (val.length === 0) {
                 div.innerText = "No changes.";
                 await new Promise(r => setTimeout(r, 1000));
@@ -62,6 +67,12 @@ class Edit {
                 elem?.parentNode?.removeChild(elem);
             }
            
+
+            // Update Column in Postgres cats table
+            updateOtherDetailsColumn(parseInt(this.cat.id), val);
+
+            
+            // 
             let updatedItem = await fetchSingleItem(this.cat.id);
             let newCat = new Cat(
                 updatedItem["id"],
@@ -70,7 +81,7 @@ class Edit {
                 updatedItem["breed_name"],
                 updatedItem["other_details"]
                 ) 
-            console.log(this.cat.id, this.cat, newCat.div);
+      
             document.getElementById(this.cat.id).innerHTML = newCat.div.innerHTML;
             document.getElementById("description").innerHTML = newCat.description;
             div.innerText = "Updated Succesfully!";

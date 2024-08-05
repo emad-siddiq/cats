@@ -1,7 +1,9 @@
+// Reveals on hovering on the bottom side of the carousel
+// Stores Cat details retried from db
 
 class Description {
     div: HTMLElement;
-
+    
     constructor() {
         this.div = this.createDescriptionDiv();
     }  
