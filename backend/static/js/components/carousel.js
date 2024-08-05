@@ -104,8 +104,9 @@ class Carousel {
         (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
         // Add new cat
         this.curr_cat_id += 1;
-        console.log(this, this.curr_cat_id, this.cat_cache);
-        this.div.appendChild(this.cat_cache[this.curr_cat_id % 10].div);
+        let cat = this.cat_cache[this.curr_cat_id % 10];
+        this.description.innerText = cat.description;
+        this.div.appendChild(cat.div);
     }
     loadPrev() {
         var _a;
@@ -119,8 +120,9 @@ class Carousel {
         (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
         // Add new cat
         this.curr_cat_id += 1;
-        console.log(this, this.curr_cat_id, this.cat_cache);
-        this.div.appendChild(this.cat_cache[this.curr_cat_id % 10].div);
+        let cat = this.cat_cache[this.curr_cat_id % 10];
+        this.description.innerText = cat.description;
+        this.div.appendChild(cat.div);
     }
     getNewBatch() {
         // Fetch 10 images and load them into the cache.
@@ -129,14 +131,14 @@ class Carousel {
             if (data) {
                 let images = data["images"];
                 for (let i = 1; i < images.length + 1; i++) {
-                    let cat = new Cat((this.curr_cat_id + i).toString(), images[i - 1]["data"]);
+                    let cat = new Cat((this.curr_cat_id + i).toString(), images[i - 1]["data"], images[i - 1]["description"]);
                     this.cat_cache[i] = cat;
                     console.log(cat, this.cat_cache);
                 }
                 // Set first cat from call as default cat
                 this.div.appendChild(this.cat_cache[1].div);
                 this.curr_cat_id += 1;
-                this.description.innerText = "what waht";
+                this.description.innerText = this.cat_cache[1].description;
                 this.page += 1;
                 if (this.page > 10) {
                     this.page = 1;

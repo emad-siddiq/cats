@@ -1,7 +1,7 @@
 import yaml 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image, create_table, get_paginated_cats_from_db
+from db.database import  insert_image, create_table, get_paginated_cats_from_db,clear_table
 import concurrent.futures
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -11,9 +11,26 @@ from typing import List, Dict, Generator
 from math import ceil
 from fastapi import FastAPI, Query, HTTPException
 import requests
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+import json
 
+# Allow CORS
+origins = [
+    "http://localhost",
+    "http://localhost:8000",  # React or other frontend development server
+]
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows CORS for specified origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
 CAT_API_BASE = "https://api.thecatapi.com/v1/images/"
 
 with open('./../config.yml', 'r') as file:
@@ -26,17 +43,21 @@ params:
     limit: int, max cats to download
     order: ASCD | DESC | RAND
 """
-def call_cat_api(limit=10, order="RAND"):
-        url = CAT_API_BASE + """search?limit={LIMIT}&order={ORDER}&api_key={CAT_API_KEY}""".format(LIMIT=limit, ORDER=order, CAT_API_KEY=config["CAT_API_KEY"])
+def call_cat_api(limit=10, order="RAND", breed=None):
+        url = CAT_API_BASE + """search?has_breeds=1&limit={LIMIT}&order={ORDER}&api_key={CAT_API_KEY}""".format(LIMIT=limit, ORDER=order, CAT_API_KEY=config["CAT_API_KEY"])
+        if breed:
+            print(breed)
+            url += "&breed_ids=" + breed
+            print(url)
         return requests.get(url, timeout=10)
 
 
 """Downloads a hundred images and inserts them inside the images table"""
-def get_hundred_random_cats():
+def get_hundred_random_cats(breed=None):
     cats = []
     while len(cats) < 100:
         with ThreadPoolExecutor(max_workers=16) as executor:
-            future_cats = {executor.submit(call_cat_api)}
+            future_cats = {executor.submit(call_cat_api, 10, "RAND", breed)}
             for future in concurrent.futures.as_completed(future_cats):
                  if future.result():
                     cats += future.result().json()
@@ -45,20 +66,20 @@ def get_hundred_random_cats():
     return cats[:100]
 
 
-def download_and_get_binary(url,label, timeout):
-    print("Downloading image")
+def download_and_get_binary(url,label, description, timeout):
     img_binary = requests.get(url, timeout=timeout).content
-    return [label, img_binary]
+    return [label, description, img_binary]
 
 def download_images(cats):
     count = 0
+    print(cats[0])
     with ThreadPoolExecutor(max_workers=16) as executor:
-        future_images = {executor.submit(download_and_get_binary, i["url"], i["id"], 10) for i in cats}
+        future_images = {executor.submit(download_and_get_binary, i["url"], i["id"], json.dumps(i["breeds"]), 10) for i in cats}
         for future in concurrent.futures.as_completed(future_images):
             result = future.result()
             count += 1
             print("Download Image #", count)
-            insert_image(result[0], result[1])  
+            insert_image(result[0], result[1], result[2])  
 
 
 ### MAIN
@@ -69,7 +90,7 @@ def main():
     print("Creating table")
     create_table()
 
-    cats = get_hundred_random_cats()
+    cats = get_hundred_random_cats(breed=None)
 
     print(f"Total time: {time.perf_counter() - start}")
     download_images(cats)
@@ -83,6 +104,30 @@ main()
 @app.get("/cats")
 async def get_cats(page: int = Query(1, alias="page"), per_page: int = Query(10, alias="per_page")):
     return get_paginated_cats_from_db(page, per_page)
+
+# Define the request body model
+class Item(BaseModel):
+    value: str
+
+
+@app.get("/breeds")
+async def breeds():
+    resp = requests.get("https://api.thecatapi.com/v1/breeds")
+    json = resp.json()
+
+    response = {
+        "breeds" : [(i["id"], i["name"]) for i in json] 
+              }
+    return response
+
+# Define the POST endpoint
+@app.post("/set_breed/")
+async def create_item(item: Item):
+    clear_table()
+    print("BREED", item.value)
+    cats = get_hundred_random_cats(item.value)
+    download_images(cats)
+    return {"done": "ok"}
 
 
 app.mount("/", StaticFiles(directory="./static",html = True), name="static")

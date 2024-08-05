@@ -1,13 +1,17 @@
+import { Description } from "./description";
+
 class Cat {
 
     div: HTMLElement;
     id: string;
     base64_img: string;
-    
-    constructor(id: string, base64_img: string) {
+    description: string;
+
+    constructor(id: string, base64_img: string, description: string) {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
+        this.description = description;
     }
 
 

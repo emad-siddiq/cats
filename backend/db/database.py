@@ -28,6 +28,7 @@ def create_table(db_config=db_config):
     CREATE TABLE cats (
     id SERIAL PRIMARY KEY,
     label VARCHAR(100) NOT NULL,
+    description TEXT,
     data BYTEA NOT NULL
 );
 """
@@ -49,18 +50,39 @@ def create_table(db_config=db_config):
     except Exception as e:
         print(f"Error creating table: {e}")
 
-def insert_image(label: str, binary_data: bytes, db_config=db_config):
+def clear_table():
+    try:
+        conn = psycopg.connect(**db_config)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        TRUNCATE cats;
+        """)
+
+        # Commit the transaction
+        conn.commit()
+
+        print("Truncated successfully")
+    except Exception as error:
+        print(f"Error truncating db: {error}")
+        conn.rollback()
+    finally:
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+
+def insert_image(label: str, description: str, binary_data: bytes, db_config=db_config):
     try:
         conn = psycopg.connect(**db_config)
         cursor = conn.cursor()
 
         # Insert the image data into the images table
         insert_query = """
-        INSERT INTO cats(label, data)
-        VALUES (%s, %s)
+        INSERT INTO cats(label, description, data)
+        VALUES (%s, %s, %s)
         """
-        print("Type of downloaded image", "")
-        cursor.execute(insert_query, (label, psycopg.Binary(binary_data)))
+        cursor.execute(insert_query, (label, description, psycopg.Binary(binary_data)))
 
         # Commit the transaction
         conn.commit()
@@ -160,7 +182,8 @@ def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_co
             "images": [{
                 "id":image[0],
                 "image_url":image[1],
-                "data":decode(image[2])} for image in images]
+                "description":image[2],
+                "data":decode(image[3])} for image in images]
         }
 
         return response

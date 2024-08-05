@@ -1,8 +1,9 @@
 class Cat {
-    constructor(id, base64_img) {
+    constructor(id, base64_img, description) {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
+        this.description = description;
     }
     createCatImgDiv() {
         var image = new Image();
