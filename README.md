@@ -4,7 +4,7 @@
 
 1. Install [Docker](https://docs.docker.com/engine/install/) and [Python](https://www.python.org/downloads/) on your local machine. 
 
-2. From the repo root run  `docker compose up -d`. 
+2. Clone this repo and from the root run  `docker compose up -d`. 
 This will start a postgres container and expose it on `localhost:5432`.
 
 3. `cd` to the `backend` folder.
@@ -35,7 +35,7 @@ Alternatively, `fastapi dev main.py`.
 
 Access the cat app web at `localhost:8000`. You can select your favorites and filter by breeds.
 
-![preview app](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
 
 
 You can turn off the `venv` when you are done with app using `deactivate`.
