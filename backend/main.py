@@ -1,7 +1,7 @@
 import yaml 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image, create_table, get_paginated_cats_from_db,clear_table
+from db.database import  insert_image, create_table, get_paginated_cats_from_db,select_by_breed_id, get_breeds, decode
 import concurrent.futures
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -66,20 +66,34 @@ def get_hundred_random_cats(breed=None):
     return cats[:100]
 
 
-def download_and_get_binary(url,label, description, timeout):
+def download_and_get_binary(cat_json, timeout):
+    url = cat_json["url"]
+    breed_id = ""
+    breed_name = ""
+    other_details = ""
+    if cat_json["breeds"] and len(cat_json["breeds"]) > 0:
+          breed_id = cat_json["breeds"][0]["id"]
+          breed_name = cat_json["breeds"][0]["name"]
+          
+          details = ["Temperament", "Origin", "Life_span"]
+          other_details = []
+          for i in details:
+                if i.lower() in cat_json["breeds"][0]:
+                      other_details.append(i + ": "+ cat_json["breeds"][0][i.lower()])
+    print(breed_id, breed_name, other_details)
     img_binary = requests.get(url, timeout=timeout).content
-    return [label, description, img_binary]
+    return [breed_id, breed_name, other_details, img_binary]
 
 def download_images(cats):
     count = 0
     print(cats[0])
     with ThreadPoolExecutor(max_workers=16) as executor:
-        future_images = {executor.submit(download_and_get_binary, i["url"], i["id"], json.dumps(i["breeds"]), 10) for i in cats}
+        future_images = {executor.submit(download_and_get_binary, i, 10) for i in cats}
         for future in concurrent.futures.as_completed(future_images):
             result = future.result()
             count += 1
             print("Download Image #", count)
-            insert_image(result[0], result[1], result[2])  
+            insert_image(str(result[0]), str(result[1]), str(result[2]), result[3])  
 
 
 ### MAIN
@@ -112,22 +126,28 @@ class Item(BaseModel):
 
 @app.get("/breeds")
 async def breeds():
-    resp = requests.get("https://api.thecatapi.com/v1/breeds")
-    json = resp.json()
-
-    response = {
-        "breeds" : [(i["id"], i["name"]) for i in json] 
-              }
-    return response
+    
+    return get_breeds()
 
 # Define the POST endpoint
 @app.post("/set_breed/")
 async def create_item(item: Item):
-    clear_table()
     print("BREED", item.value)
-    cats = get_hundred_random_cats(item.value)
-    download_images(cats)
-    return {"done": "ok"}
+    # Select only images that are of this breed
+    
+    cats = select_by_breed_id(item.value)
+
+    response = {
+            "page":1,
+            "per_page":len(cats),
+            "total_images":len(cats),
+            "images": [{
+                "id": cat[0],
+                "breed_id":cat[1],
+                "breed_name":cat[2],
+                "other_details":cat[3],
+                "data":decode(cat[4])} for cat in cats]
+        }
 
 
 app.mount("/", StaticFiles(directory="./static",html = True), name="static")

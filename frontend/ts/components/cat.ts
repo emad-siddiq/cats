@@ -6,12 +6,23 @@ class Cat {
     id: string;
     base64_img: string;
     description: string;
+    breed_id: string;
+    breed_name: string;
+    other_details: string;
 
-    constructor(id: string, base64_img: string, description: string) {
+    constructor(id: string, base64_img: string, breed_id: string, breed_name: string, other_details: string) {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
-        this.description = description;
+        this.breed_id = breed_id;
+        this.breed_name = breed_name;
+        this.other_details = other_details.slice(1,-1).split(",").join(" ");
+
+        this.description = this.getDescription()
+    }
+
+    getDescription():string {
+        return "Breed Name: " + this.breed_name + "\nOther Details: " + this.other_details;
     }
 
 

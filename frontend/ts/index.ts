@@ -7,13 +7,16 @@ import { Favorites } from "./components/favorites.js";
 let carousel = new Carousel();
 let favorites = new Favorites();
 
-
 let catbreeds = document.getElementById("catbreeds");
 
+
 fetchBreeds().then((data) => {
-    let breeds = data["breeds"];
-    for (let i = 0; i < breeds.length; i++) {
-        catbreeds.innerHTML += "<option value=" + breeds[i][0] + ">"+breeds[i][1]+"</option>";
+
+    for (let i = 0; i < data.length; i++) {
+        console.log(data[i]);
+        let id = data[i][0];
+        let name = data[i][1];
+        catbreeds.innerHTML += "<option value=" + id + ">"+name+"</option>";
     }
 }
 );
@@ -23,7 +26,7 @@ catbreeds.addEventListener("change", (e) => {
     const breed: Breed = { value: value };
 
     postBreed("http://127.0.0.1:8000/set_breed/", breed);
-    
+
 })
 
 
@@ -40,7 +43,7 @@ document.getElementById("add-to-favs").addEventListener("click", () => {
 
 document.getElementById("remove-from-favs").addEventListener("click", () => {
 
-    favorites.removeFromFavorites(carousel.getCurrentCat());
+    favorites.removeFromFavorites(carousel.getCurrentCat().id);
 })
 
 
@@ -84,7 +87,7 @@ async function postBreed(url: string, breed: Breed) {
         const data = await response.json();
         console.log('Response data:', data);
         if (data["done"] === "ok") {
-            carousel.getNewBatch();
+            carousel.cat_cache = data["data"];
         }
     } catch (error) {
         console.error('Error posting item:', error);

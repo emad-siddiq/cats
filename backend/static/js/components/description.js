@@ -15,6 +15,10 @@ class Description {
         div.style.backgroundColor = "rgb(0, 0, 0, 0.2)";
         div.style.zIndex = "2";
         div.style.opacity = "0";
+        div.style.color = "white";
+        div.style.fontSize = "24px";
+        div.style.paddingLeft = "5px";
+        div.style.paddingTop = "5px";
         div.addEventListener("mouseenter", () => {
             div.style.opacity = "1";
         });

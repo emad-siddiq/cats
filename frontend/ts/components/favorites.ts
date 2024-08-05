@@ -54,14 +54,16 @@ class Favorites {
         this.favorites.push(cat.id.toString());
         console.log("Added to Favorites", this.favorites);
 
-
+        favImageDiv.addEventListener("dblclick", (e) => {
+            this.removeFromFavorites(cat.id);
+        })
         this.div.appendChild(favImageDiv);
     }
 
-    removeFromFavorites(cat: Cat) {
-        let id = "fav-" + cat.id.toString();
-        console.log("ID TO REMOVE", id, this.favorites.indexOf(cat.id.toString()));
-        let idx = this.favorites.indexOf(cat.id.toString());
+    removeFromFavorites(cat_id: string) {
+        let id = "fav-" + cat_id.toString();
+        console.log("ID TO REMOVE", id, this.favorites.indexOf(cat_id.toString()));
+        let idx = this.favorites.indexOf(cat_id.toString());
         if (idx === -1) {
             console.log("Not found in favs");
             return;

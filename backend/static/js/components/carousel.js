@@ -42,7 +42,7 @@ class Carousel {
         div.setAttribute("id", "next-cat-arrow");
         div.setAttribute("class", "next-cat-arrow");
         div.style.position = "absolute";
-        div.style.top = "10vh";
+        div.style.top = "12vh";
         div.style.left = "55vw";
         div.style.width = "20vw";
         div.style.height = "80vh";
@@ -119,10 +119,15 @@ class Carousel {
         var elem = document.getElementById(this.curr_cat_id.toString());
         (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
         // Add new cat
-        this.curr_cat_id += 1;
-        let cat = this.cat_cache[this.curr_cat_id % 10];
-        this.description.innerText = cat.description;
-        this.div.appendChild(cat.div);
+        this.curr_cat_id -= 1;
+        if (this.curr_cat_id < 1) {
+            this.curr_cat_id = 0;
+        }
+        else {
+            let cat = this.cat_cache[this.curr_cat_id % 10];
+            this.description.innerText = cat.description;
+            this.div.appendChild(cat.div);
+        }
     }
     getNewBatch() {
         // Fetch 10 images and load them into the cache.
@@ -131,7 +136,7 @@ class Carousel {
             if (data) {
                 let images = data["images"];
                 for (let i = 1; i < images.length + 1; i++) {
-                    let cat = new Cat((this.curr_cat_id + i).toString(), images[i - 1]["data"], images[i - 1]["description"]);
+                    let cat = new Cat((this.curr_cat_id + i).toString(), images[i - 1]["data"], images[i - 1]["breed_id"], images[i - 1]["breed_name"], images[i - 1]["other_details"]);
                     this.cat_cache[i] = cat;
                     console.log(cat, this.cat_cache);
                 }
@@ -147,6 +152,7 @@ class Carousel {
         });
     }
 }
+//"""Fetches paginated cats from postgres db""" 
 function fetchImages(page, limit) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = 'http://localhost:8000/cats?' + 'page=' + page + "&" + "per_page=" + limit;

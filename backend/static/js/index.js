@@ -13,9 +13,11 @@ let carousel = new Carousel();
 let favorites = new Favorites();
 let catbreeds = document.getElementById("catbreeds");
 fetchBreeds().then((data) => {
-    let breeds = data["breeds"];
-    for (let i = 0; i < breeds.length; i++) {
-        catbreeds.innerHTML += "<option value=" + breeds[i][0] + ">" + breeds[i][1] + "</option>";
+    for (let i = 0; i < data.length; i++) {
+        console.log(data[i]);
+        let id = data[i][0];
+        let name = data[i][1];
+        catbreeds.innerHTML += "<option value=" + id + ">" + name + "</option>";
     }
 });
 catbreeds.addEventListener("change", (e) => {
@@ -31,7 +33,7 @@ document.getElementById("add-to-favs").addEventListener("click", () => {
     carousel.loadNext();
 });
 document.getElementById("remove-from-favs").addEventListener("click", () => {
-    favorites.removeFromFavorites(carousel.getCurrentCat());
+    favorites.removeFromFavorites(carousel.getCurrentCat().id);
 });
 function fetchBreeds() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -66,7 +68,7 @@ function postBreed(url, breed) {
             const data = yield response.json();
             console.log('Response data:', data);
             if (data["done"] === "ok") {
-                carousel.getNewBatch();
+                carousel.cat_cache = data["data"];
             }
         }
         catch (error) {

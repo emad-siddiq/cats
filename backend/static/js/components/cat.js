@@ -1,9 +1,15 @@
 class Cat {
-    constructor(id, base64_img, description) {
+    constructor(id, base64_img, breed_id, breed_name, other_details) {
         this.base64_img = base64_img;
         this.div = this.createCatImgDiv();
         this.id = id;
-        this.description = description;
+        this.breed_id = breed_id;
+        this.breed_name = breed_name;
+        this.other_details = other_details.slice(1, -1).split(",").join(" ");
+        this.description = this.getDescription();
+    }
+    getDescription() {
+        return "Breed Name: " + this.breed_name + "\nOther Details: " + this.other_details;
     }
     createCatImgDiv() {
         var image = new Image();
