@@ -26,7 +26,7 @@ Activate virtual env:
 pip install -r requirements.txt
 ``` 
 
-From the `backend` directory run the FastAPI app with:
+`cd` into the `backend` directory and run the FastAPI app with:
 ```
 uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug
 ```
