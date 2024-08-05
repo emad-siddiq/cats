@@ -1,6 +1,7 @@
 # The Cat App
 ## How to run
 
+![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
 
 1. Install [Docker](https://docs.docker.com/engine/install/) and [Python](https://www.python.org/downloads/) on your local machine. 
 
@@ -38,7 +39,6 @@ To make changes to the TypeScript files, `cd into frontend/ts` and run `tsc -w` 
 Access the cat app web at `localhost:8000`. You can select your favorites and filter by breeds.
 Allow a few seconds for the application to download images.
 
-![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
 
 
 You can turn off the `venv` when you are done with app using `deactivate`.
