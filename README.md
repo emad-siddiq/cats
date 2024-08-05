@@ -34,6 +34,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --log-level debug
 Alternatively, `fastapi dev main.py`. 
 
 Access the cat app web at `localhost:8000`. You can select your favorites and filter by breeds.
+Allow a few seconds for the application to download images.
 
 ![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
 
