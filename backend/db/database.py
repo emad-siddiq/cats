@@ -1,7 +1,7 @@
 
 # Note: the module name is psycopg, not psycopg3
 import psycopg
-import yaml 
+import yaml
 from fastapi import HTTPException
 from typing import List, Dict
 from pydantic import BaseModel
@@ -15,11 +15,12 @@ with open('./../config.yml', 'r') as file:
 
 db_config = {
     'user': config['pg']['user'],
-    'password': config['pg']['pwd'], 
+    'password': config['pg']['pwd'],
     'dbname': config['pg']['dbname'],
     'host': config['pg']['host'],
     'port': config['pg']['port'],
-} 
+}
+
 
 def create_table(db_config=db_config):
 
@@ -27,8 +28,8 @@ def create_table(db_config=db_config):
     DROP TABLE IF EXISTS cats;
     CREATE TABLE cats (
     id SERIAL PRIMARY KEY,
-    breed_id TEXT, 
-    breed_name TEXT, 
+    breed_id TEXT,
+    breed_name TEXT,
 
     other_details TEXT,
     data BYTEA NOT NULL
@@ -46,11 +47,12 @@ def create_table(db_config=db_config):
         # Close the cursor and connection
         cur.close()
         conn.close()
-        
+
         print("Table 'cats' created successfully")
 
     except Exception as e:
         print(f"Error creating table: {e}")
+
 
 def clear_table():
     try:
@@ -74,7 +76,8 @@ def clear_table():
         conn.close()
 
 
-def insert_image(breed_id: str, breed_name: str, other_details: str, binary_data: bytes, db_config=db_config):
+def insert_image(breed_id: str, breed_name: str,
+                 other_details: str, binary_data: bytes, db_config=db_config):
     try:
         conn = psycopg.connect(**db_config)
         cursor = conn.cursor()
@@ -84,7 +87,8 @@ def insert_image(breed_id: str, breed_name: str, other_details: str, binary_data
         INSERT INTO cats(breed_id, breed_name, other_details, data)
         VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(insert_query, (breed_id, breed_name, other_details, psycopg.Binary(binary_data)))
+        cursor.execute(insert_query, (breed_id, breed_name,
+                       other_details, psycopg.Binary(binary_data)))
 
         # Commit the transaction
         conn.commit()
@@ -108,11 +112,12 @@ def get_all_cats(dbconfig=db_config):
             except Exception as e:
                 print(e)
 
+
 def get_cats_from(start, end, db_config=db_config):
     try:
         conn = psycopg.connect(**db_config)
         cursor = conn.cursor()
-        cursor.execute("""SELECT * FROM cats 
+        cursor.execute("""SELECT * FROM cats
                                         WHERE id BETWEEN
                                          {start} AND {end};""".format(start=start, end=end))
         cats = cursor.fetchall()
@@ -124,6 +129,7 @@ def get_cats_from(start, end, db_config=db_config):
         # Close the cursor and connection
         cursor.close()
         conn.close()
+
 
 def images_table_len(db_config=db_config):
     try:
@@ -150,20 +156,22 @@ def images_table_len(db_config=db_config):
    We convert this to a base64 encoded byte string to send as JSON
    https://docs.python.org/3/library/base64.html
 """
+
+
 def decode(bytea_data):
-    base64_img = base64.b64encode(bytea_data) #Encode the bytes-like object s using Base64 and return the encoded bytes.
+    # Encode the bytes-like object s using Base64 and return the encoded bytes.
+    base64_img = base64.b64encode(bytea_data)
     return base64_img
 
 
-def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_config):
-
-    
+def get_paginated_cats_from_db(
+        page: int, per_page: int, db_config: Dict = db_config):
 
     conn = psycopg.connect(**db_config)
-    cursor = conn.cursor()  
+    cursor = conn.cursor()
 
     try:
-        
+
         # Count total images
         cursor.execute("SELECT COUNT(*) FROM cats;")
         total_images = cursor.fetchone()[0]
@@ -172,19 +180,20 @@ def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_co
         offset = (page - 1) * per_page
 
         # Retrieve paginated images
-        cursor.execute("SELECT * FROM cats ORDER BY id LIMIT %s OFFSET %s;", (per_page, offset))
+        cursor.execute(
+            "SELECT * FROM cats ORDER BY id LIMIT %s OFFSET %s;", (per_page, offset))
         cats = cursor.fetchall()
         # Construct response
         response = {
-            "page":page,
-            "per_page":per_page,
-            "total_images":total_images,
+            "page": page,
+            "per_page": per_page,
+            "total_images": total_images,
             "cats": [{
                 "id": cat[0],
-                "breed_id":cat[1],
-                "breed_name":cat[2],
-                "other_details":cat[3],
-                "data":decode(cat[4])} for cat in cats]
+                "breed_id": cat[1],
+                "breed_name": cat[2],
+                "other_details": cat[3],
+                "data": decode(cat[4])} for cat in cats]
         }
 
         return response
@@ -195,8 +204,7 @@ def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_co
         cursor.close()
         conn.close()
 
- 
-            
+
 def get_breeds():
     try:
         conn = psycopg.connect(**db_config)
@@ -207,10 +215,8 @@ def get_breeds():
         """)
         breeds = cursor.fetchall()
 
-
         # Commit the transaction
 
-        
         print("Fetched breeds successfully")
         return breeds
     except Exception as error:
@@ -220,6 +226,7 @@ def get_breeds():
         cursor.close()
         conn.close()
 
+
 def select_by_breed_id(breed):
     try:
         conn = psycopg.connect(**db_config)
@@ -227,17 +234,15 @@ def select_by_breed_id(breed):
         query = """
         SELECT * FROM cats WHERE breed_id = '{breed}';
         """.format(breed=breed)
-        print(query) 
+        print(query)
         cursor.execute(query)
         cats_of_breed = cursor.fetchall()
 
-
         # Commit the transaction
 
-        
         print("Fetched breeds successfully")
         return cats_of_breed
-    
+
     except Exception as error:
         print(f"Error fetching breeds from db: {error}")
     finally:
@@ -251,23 +256,24 @@ class UpdateTextColumnRequest(BaseModel):
     id: int
     new_text: str
 
+
 def update_other_details(request: UpdateTextColumnRequest):
-    try: 
+    try:
         conn = psycopg.connect(**db_config)
-        cursor = conn.cursor()  
+        cursor = conn.cursor()
 
         if (len(request.new_text) == 0):
-            return {"message": "Nothing to update"} 
+            return {"message": "Nothing to update"}
         # Update query
         update_query = "UPDATE cats SET other_details = %s WHERE id = %s"
         cursor.execute(update_query, (request.new_text, request.id))
-        
+
         # Commit the transaction
         conn.commit()
 
         if cursor.rowcount == 0:
             raise HTTPException(status_code=404, detail="Item not found")
-        
+
         # Close the cursor and connection
         cursor.close()
         conn.close()
@@ -276,7 +282,7 @@ def update_other_details(request: UpdateTextColumnRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 
 def get_single_cat(id: str):
     try:
