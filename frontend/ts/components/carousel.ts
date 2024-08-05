@@ -11,12 +11,14 @@ class Carousel {
     description: HTMLElement;
 
     constructor() {
-        this.div = this.createCarouselDiv();
+        this.id = "carousel";
+
         this.page = 1;
-        this.id = "carousel"
         this.per_page = 10;
         this.getNewBatch();
         this.cat_cache = {};
+        this.div = this.createCarouselDiv();
+
         this.curr_cat_id = 0;
     }  
 
@@ -26,8 +28,8 @@ class Carousel {
     }
     createCarouselDiv() {
         let div = document.createElement("div");
-        div.setAttribute("id", this.id);
-        div.setAttribute("class", this.id);
+        div.setAttribute("id", this.id.toString());
+        div.setAttribute("class", this.id.toString());
         div.style.boxSizing = "border-box";
         div.style.gridColumn = "1/2";
 
@@ -51,8 +53,8 @@ class Carousel {
         div.setAttribute("class", "next-cat-arrow");
         
         div.style.position = "absolute";
-        div.style.top = "12vh";
-        div.style.left = "55vw";
+        div.style.top = "10vh";
+        div.style.left = "52vw";
         div.style.width = "20vw";
         div.style.height = "80vh"
         div.style.zIndex = "10";
@@ -130,14 +132,24 @@ class Carousel {
             this.getNewBatch();
             return;
         }
+
         // Remove current cat
         var elem = document.getElementById(this.curr_cat_id.toString());
         elem?.parentNode?.removeChild(elem);
         // Add new cat
+
         this.curr_cat_id += 1;
+        console.log(this.curr_cat_id);
+
         let cat = this.cat_cache[this.curr_cat_id % 10];
-        this.description.innerText = cat.description;
-        this.div.appendChild(cat.div);
+        if (cat) {
+            console.log(cat);
+            this.description.innerText = cat.description;
+            this.div.appendChild(cat.div);
+        } else {
+            this.getNewBatch();
+        }
+        
     }
 
     loadPrev() {
@@ -167,17 +179,17 @@ class Carousel {
         // Display one
         fetchImages(this.page.toString(), this.per_page.toString()).then(data => {
             if (data) {
-                let images = data["images"];
+                console.log(data.keys);
+                let cats = data["cats"];
             
-                for (let i = 1; i < images.length+1; i++) {
+                for (let i = 1; i < cats.length+1; i++) {
                     let cat = new Cat((this.curr_cat_id+i).toString(),
-                                                    images[i-1]["data"],
-                                                    images[i-1]["breed_id"],
-                                                    images[i-1]["breed_name"],
-                                                    images[i-1]["other_details"]
+                                                    cats[i-1]["data"],
+                                                    cats[i-1]["breed_id"],
+                                                    cats[i-1]["breed_name"],
+                                                    cats[i-1]["other_details"]
                     ) 
                     this.cat_cache[i] = cat;
-                    console.log(cat, this.cat_cache);
                 }
 
                 // Set first cat from call as default cat

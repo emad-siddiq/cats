@@ -141,13 +141,15 @@ async def create_item(item: Item):
             "page":1,
             "per_page":len(cats),
             "total_images":len(cats),
-            "images": [{
+            "cats": [{
                 "id": cat[0],
                 "breed_id":cat[1],
                 "breed_name":cat[2],
                 "other_details":cat[3],
                 "data":decode(cat[4])} for cat in cats]
         }
+    
+    return response
 
 
 app.mount("/", StaticFiles(directory="./static",html = True), name="static")

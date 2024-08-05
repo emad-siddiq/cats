@@ -16,7 +16,9 @@ class Description {
         div.style.zIndex = "2";
         div.style.opacity = "0";
         div.style.color = "white";
-        div.style.fontSize = "24px";
+        div.style.fontSize = "35px";
+        div.style.fontFamily = "Palatino";
+
         div.style.paddingLeft = "5px";
         div.style.paddingTop = "5px";
         div.addEventListener("mouseenter", () => {

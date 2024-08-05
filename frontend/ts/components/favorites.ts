@@ -3,10 +3,12 @@ import { Cat } from "./cat.js"
 class Favorites {
     favorites: Array<String>;
     div: HTMLElement;
+    first_fav: boolean;
 
     constructor() {
         this.favorites = [];
         this.div = this.createFavoritesDiv();
+        this.first_fav = true;
     }  
     createFavoritesDiv() {
         let div = document.createElement("div");
@@ -22,10 +24,14 @@ class Favorites {
         div.style.flexDirection ="row";
         div.style.alignContent = "flex-start";
         div.style.overflow = "scroll";
-        div.style.scrollbarColor = "#007 #bada55";
+        div.style.scrollbarColor = "#390 #bada55";
 
         div.style.position = "absolute";
         div.style.boxShadow = "0px 2px 15px 0px rgba(0, 0, 0, .1)";
+        div.style.fontSize = "40px";
+        div.style.color = "gray";
+
+        div.innerText = "Favorites\n ... \nDouble click\n  \n on a cat to add it to favorites. \n Double click on it here in favorites to unlike."
 
         return div;
     }
@@ -56,7 +62,12 @@ class Favorites {
 
         favImageDiv.addEventListener("dblclick", (e) => {
             this.removeFromFavorites(cat.id);
+            this.favorites = this.favorites.filter(e => e !== cat.id);
         })
+        if (this.first_fav) {
+            this.div.innerText = "";
+            this.first_fav = false;
+        }
         this.div.appendChild(favImageDiv);
     }
 

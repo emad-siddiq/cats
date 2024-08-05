@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { Carousel } from "./components/carousel.js";
 import { Favorites } from "./components/favorites.js";
+import { Cat } from "./components/cat.js";
 let carousel = new Carousel();
 let favorites = new Favorites();
 let catbreeds = document.getElementById("catbreeds");
 fetchBreeds().then((data) => {
     for (let i = 0; i < data.length; i++) {
-        console.log(data[i]);
         let id = data[i][0];
         let name = data[i][1];
         catbreeds.innerHTML += "<option value=" + id + ">" + name + "</option>";
@@ -28,6 +28,11 @@ catbreeds.addEventListener("change", (e) => {
 document.getElementById("cats").appendChild(carousel.div);
 document.getElementById("cats").appendChild(favorites.div);
 document.getElementById("add-to-favs").addEventListener("click", () => {
+    console.log(carousel.getCurrentCat());
+    favorites.addToFavorites(carousel.getCurrentCat());
+    carousel.loadNext();
+});
+document.getElementById("carousel").addEventListener("dblclick", () => {
     console.log(carousel.getCurrentCat());
     favorites.addToFavorites(carousel.getCurrentCat());
     carousel.loadNext();
@@ -54,6 +59,7 @@ function fetchBreeds() {
 }
 function postBreed(url, breed) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         try {
             const response = yield fetch(url, {
                 method: 'POST',
@@ -62,13 +68,29 @@ function postBreed(url, breed) {
                 },
                 body: JSON.stringify(breed)
             });
+            console.log(carousel.curr_cat_id);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = yield response.json();
-            console.log('Response data:', data);
-            if (data["done"] === "ok") {
-                carousel.cat_cache = data["data"];
+            if (data["cats"]) {
+                console.log('Response data:', data["cats"]);
+                let cats = data["cats"];
+                carousel.cat_cache = {};
+                carousel.curr_cat_id = 0;
+                for (let i = 1; i < cats.length + 1; i++) {
+                    let cat = new Cat((carousel.curr_cat_id + i).toString(), cats[i - 1]["data"], cats[i - 1]["breed_id"], cats[i - 1]["breed_name"], cats[i - 1]["other_details"]);
+                    carousel.cat_cache[i] = cat;
+                }
+                // Remove current cat and replace with first cat from selected breed
+                var elem = document.getElementById(carousel.curr_cat_id.toString());
+                (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
+                carousel.curr_cat_id += 1;
+                let cat = carousel.cat_cache[carousel.curr_cat_id % 10];
+                console.log(carousel.cat_cache, carousel.curr_cat_id, cat);
+                carousel.description.innerText = cat.description;
+                carousel.div.appendChild(cat.div);
+                console.log(carousel.cat_cache);
             }
         }
         catch (error) {

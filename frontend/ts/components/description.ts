@@ -20,7 +20,7 @@ class Description {
         div.style.zIndex = "2";
         div.style.opacity = "0";
         div.style.color = "white";
-        div.style.fontSize = "24px";
+        div.style.fontSize = "30px";
         div.style.paddingLeft = "5px";
         div.style.paddingTop= "5px";
 

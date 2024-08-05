@@ -11,12 +11,12 @@ import { Cat } from "./cat.js";
 import { Description } from "./description.js";
 class Carousel {
     constructor() {
-        this.div = this.createCarouselDiv();
-        this.page = 1;
         this.id = "carousel";
+        this.page = 1;
         this.per_page = 10;
         this.getNewBatch();
         this.cat_cache = {};
+        this.div = this.createCarouselDiv();
         this.curr_cat_id = 0;
     }
     getCurrentCat() {
@@ -25,8 +25,8 @@ class Carousel {
     }
     createCarouselDiv() {
         let div = document.createElement("div");
-        div.setAttribute("id", this.id);
-        div.setAttribute("class", this.id);
+        div.setAttribute("id", this.id.toString());
+        div.setAttribute("class", this.id.toString());
         div.style.boxSizing = "border-box";
         div.style.gridColumn = "1/2";
         let next_div = this.createNextArrowDiv();
@@ -42,8 +42,8 @@ class Carousel {
         div.setAttribute("id", "next-cat-arrow");
         div.setAttribute("class", "next-cat-arrow");
         div.style.position = "absolute";
-        div.style.top = "12vh";
-        div.style.left = "55vw";
+        div.style.top = "10vh";
+        div.style.left = "52vw";
         div.style.width = "20vw";
         div.style.height = "80vh";
         div.style.zIndex = "10";
@@ -104,9 +104,16 @@ class Carousel {
         (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
         // Add new cat
         this.curr_cat_id += 1;
+        console.log(this.curr_cat_id);
         let cat = this.cat_cache[this.curr_cat_id % 10];
-        this.description.innerText = cat.description;
-        this.div.appendChild(cat.div);
+        if (cat) {
+            console.log(cat);
+            this.description.innerText = cat.description;
+            this.div.appendChild(cat.div);
+        }
+        else {
+            this.getNewBatch();
+        }
     }
     loadPrev() {
         var _a;
@@ -134,11 +141,11 @@ class Carousel {
         // Display one
         fetchImages(this.page.toString(), this.per_page.toString()).then(data => {
             if (data) {
-                let images = data["images"];
-                for (let i = 1; i < images.length + 1; i++) {
-                    let cat = new Cat((this.curr_cat_id + i).toString(), images[i - 1]["data"], images[i - 1]["breed_id"], images[i - 1]["breed_name"], images[i - 1]["other_details"]);
+                console.log(data.keys);
+                let cats = data["cats"];
+                for (let i = 1; i < cats.length + 1; i++) {
+                    let cat = new Cat((this.curr_cat_id + i).toString(), cats[i - 1]["data"], cats[i - 1]["breed_id"], cats[i - 1]["breed_name"], cats[i - 1]["other_details"]);
                     this.cat_cache[i] = cat;
-                    console.log(cat, this.cat_cache);
                 }
                 // Set first cat from call as default cat
                 this.div.appendChild(this.cat_cache[1].div);

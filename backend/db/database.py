@@ -180,7 +180,7 @@ def get_paginated_cats_from_db(page: int, per_page: int, db_config: Dict = db_co
             "page":page,
             "per_page":per_page,
             "total_images":total_images,
-            "images": [{
+            "cats": [{
                 "id": cat[0],
                 "breed_id":cat[1],
                 "breed_name":cat[2],

@@ -22,15 +22,16 @@
 .add-to-favs {
     position: absolute;
     top: 5vh;
-    left: 58vw;
-    font-size: 30px;
+    left: 57vw;
+    font-size: 35px;
 }
 
-.remove-from-favs {
+.edit-cat-data {
     position: absolute;
-    top: 20vh;
-    left: 63vw;
-    font-size: 30px;
+    top: 5vh;
+    left: 67vw;
+    font-size: 35px;
 }
+
 
 
