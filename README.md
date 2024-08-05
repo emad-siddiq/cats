@@ -1,7 +1,7 @@
 # The Cat App
 ## How to run
 
-![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
+![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.gif)
 
 1. Install [Docker](https://docs.docker.com/engine/install/) and [Python](https://www.python.org/downloads/) on your local machine. 
 
