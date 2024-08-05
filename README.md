@@ -2,9 +2,10 @@
 ## How to run
 
 
-Install [Docker](https://docs.docker.com/engine/install/) and Python on your local machine. 
+Install [Docker](https://docs.docker.com/engine/install/) and [Python](https://www.python.org/downloads/) on your local machine. 
 
-From repository root run postgres with `docker compose up -d`. This will start a postgres container and expose it on `localhost:5432`.
+From the repo root run  `docker compose up -d`. 
+This will start a postgres container and expose it on `localhost:5432`.
 
 Change directory to the backend folder to start the FastAPI Server on `localhost:8000`:
 ```
