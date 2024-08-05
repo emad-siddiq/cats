@@ -128,7 +128,7 @@ class Carousel {
         // Add new cat
         this.curr_cat_id -= 1;
         if (this.curr_cat_id < 1) {
-            this.curr_cat_id = 0;
+            this.curr_cat_id = 1;
         }
         else {
             let cat = this.cat_cache[this.curr_cat_id % 10];

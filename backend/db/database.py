@@ -89,7 +89,6 @@ def insert_image(breed_id: str, breed_name: str, other_details: str, binary_data
         # Commit the transaction
         conn.commit()
 
-        print("Image inserted successfully")
     except Exception as error:
         print(f"Error inserting image: {error}")
         conn.rollback()

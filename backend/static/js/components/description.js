@@ -1,3 +1,5 @@
+// Reveals on hovering on the bottom side of the carousel
+// Stores Cat details retried from db
 class Description {
     constructor() {
         this.div = this.createDescriptionDiv();
@@ -16,9 +18,7 @@ class Description {
         div.style.zIndex = "2";
         div.style.opacity = "0";
         div.style.color = "white";
-        div.style.fontSize = "35px";
-        div.style.fontFamily = "Palatino";
-
+        div.style.fontSize = "30px";
         div.style.paddingLeft = "5px";
         div.style.paddingTop = "5px";
         div.addEventListener("mouseenter", () => {

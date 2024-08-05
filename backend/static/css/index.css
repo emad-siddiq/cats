@@ -12,6 +12,13 @@
     padding-top: 1%;
 }
 
+.breeds {
+    position:absolute;
+    top:0vh;
+    left: 90vw;
+    color: blue;
+}
+
 .catbreeds {
     position: absolute;
     top: 5vh;

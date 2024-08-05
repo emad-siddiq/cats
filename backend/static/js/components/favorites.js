@@ -4,6 +4,7 @@ class Favorites {
         this.div = this.createFavoritesDiv();
         this.first_fav = true;
     }
+    // A div on the right side of the screen to store current session favorites
     createFavoritesDiv() {
         let div = document.createElement("div");
         div.setAttribute("id", "favorites");
@@ -21,14 +22,12 @@ class Favorites {
         div.style.scrollbarColor = "#390 #bada55";
         div.style.position = "absolute";
         div.style.boxShadow = "0px 2px 15px 0px rgba(0, 0, 0, .1)";
-        div.style.fontSize = "30px";
+        div.style.fontSize = "40px";
         div.style.color = "gray";
-        div.style.paddingLeft = "10px";
-        div.style.paddingTop = "10px";
-
-        div.innerText = "Favorites\n ... \nDouble click in left to add  \n Double click here to unlike.";
+        div.innerText = "Favorites\n ... \nDouble click\n  \n on a cat to add it to favorites. \n Double click on it here in favorites to unlike.";
         return div;
     }
+    // Add the current image to favorites div
     addToFavorites(cat) {
         console.log(cat);
         if (this.favorites.indexOf(cat.id.toString()) > -1) {
@@ -59,6 +58,7 @@ class Favorites {
         }
         this.div.appendChild(favImageDiv);
     }
+    // Remove from favorites div by cat id
     removeFromFavorites(cat_id) {
         var _a;
         let id = "fav-" + cat_id.toString();

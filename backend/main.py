@@ -1,19 +1,18 @@
 import yaml 
-from fastapi.staticfiles import StaticFiles
-from fastapi import FastAPI, Form, File, UploadFile
-from db.database import  insert_image,get_single_cat, create_table, get_paginated_cats_from_db,select_by_breed_id, get_breeds, decode, update_other_details
-import concurrent.futures
 import time
-from concurrent.futures import ThreadPoolExecutor
-from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
-from typing import List, Dict, Generator
-from math import ceil
-from fastapi import FastAPI, Query, HTTPException
 import requests
+from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Query
+from db.database import  insert_image,get_single_cat, create_table
+from db.database import get_paginated_cats_from_db,select_by_breed_id, get_breeds, decode, update_other_details
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor
+from fastapi import FastAPI
+from pydantic import BaseModel
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-import json
+import sys
+
 
 # Allow CORS
 origins = [
@@ -36,28 +35,20 @@ CAT_API_BASE = "https://api.thecatapi.com/v1/images/"
 with open('./../config.yml', 'r') as file:
     config = yaml.safe_load(file)
 
-print(config["CAT_API_KEY"])
 
-"""Call Cat API, requesting 10 random cats
-params:
-    limit: int, max cats to download
-    order: ASCD | DESC | RAND
-"""
-def call_cat_api(limit=10, order="RAND", breed=None):
+
+"""Call Cat API, requesting 10 random cats"""
+def call_cat_api(limit=10, order="RAND"):
         url = CAT_API_BASE + """search?has_breeds=1&limit={LIMIT}&order={ORDER}&api_key={CAT_API_KEY}""".format(LIMIT=limit, ORDER=order, CAT_API_KEY=config["CAT_API_KEY"])
-        if breed:
-            print(breed)
-            url += "&breed_ids=" + breed
-            print(url)
         return requests.get(url, timeout=10)
 
 
-"""Downloads a hundred images and inserts them inside the images table"""
-def get_hundred_random_cats(breed=None):
+"""Downloads a hundred data for a 100 images (urls/width/height)"""
+def get_hundred_random_cats():
     cats = []
     while len(cats) < 100:
         with ThreadPoolExecutor(max_workers=16) as executor:
-            future_cats = {executor.submit(call_cat_api, 10, "RAND", breed)}
+            future_cats = {executor.submit(call_cat_api, 10, "RAND")}
             for future in concurrent.futures.as_completed(future_cats):
                  if future.result():
                     cats += future.result().json()
@@ -66,6 +57,21 @@ def get_hundred_random_cats(breed=None):
     return cats[:100]
 
 
+
+"""Takes cats json from the catapi to download images"""
+def download_images(cats):
+    count = 0
+    with ThreadPoolExecutor(max_workers=16) as executor:
+        future_images = {executor.submit(download_and_get_binary, i, 10) for i in cats}
+        for future in concurrent.futures.as_completed(future_images):
+            result = future.result()
+            count += 1
+            print("Image #" + str(count) + " download")
+            insert_image(str(result[0]), str(result[1]), str(result[2]), result[3])  
+        print("\nDone downloading images")
+
+
+"""Take cat data json and uses url to download images"""
 def download_and_get_binary(cat_json, timeout):
     url = cat_json["url"]
     breed_id = ""
@@ -80,38 +86,9 @@ def download_and_get_binary(cat_json, timeout):
           for i in details:
                 if i.lower() in cat_json["breeds"][0]:
                       other_details.append(i + ": "+ cat_json["breeds"][0][i.lower()])
-    print(breed_id, breed_name, other_details)
+
     img_binary = requests.get(url, timeout=timeout).content
     return [breed_id, breed_name, other_details, img_binary]
-
-def download_images(cats):
-    count = 0
-    print(cats[0])
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        future_images = {executor.submit(download_and_get_binary, i, 10) for i in cats}
-        for future in concurrent.futures.as_completed(future_images):
-            result = future.result()
-            count += 1
-            print("Download Image #", count)
-            insert_image(str(result[0]), str(result[1]), str(result[2]), result[3])  
-
-
-### MAIN
-def main():
-    print("Start main")
-
-    start = time.perf_counter()
-    print("Creating table")
-    create_table()
-
-    cats = get_hundred_random_cats(breed=None)
-
-    print(f"Total time: {time.perf_counter() - start}")
-    download_images(cats)
-
-main()
-
-
 
 
 # GET endpoint for paginated images
@@ -146,7 +123,6 @@ async def breeds():
 # Define the POST endpoint
 @app.post("/set_breed/")
 async def create_item(item: Item):
-    print("BREED", item.value)
     # Select only images that are of this breed
     
     cats = select_by_breed_id(item.value)
@@ -171,12 +147,25 @@ class UpdateTextColumnRequest(BaseModel):
     id: int
     new_text: str
 
-
 # PUT endpoint to update a text column
 @app.put("/update-other-details")
 def update_other_details_column(request: UpdateTextColumnRequest):
-    
     return update_other_details(request)
+
+
+def main():
+    "Initializing..."
+    start = time.perf_counter()
+    print("Creating cats table")
+    create_table()
+    print("Downloading URLs for cat images...")
+    cats_json = get_hundred_random_cats()
+    print("Downloading images")
+    download_images(cats_json)
+
+    print(f"Total time: {time.perf_counter() - start}")
+
+main()
 
 
 

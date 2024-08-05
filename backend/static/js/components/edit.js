@@ -8,11 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Cat } from "./cat.js";
+// The Edit Menu pops up when the edit button is pressed on a cat image that is in view
+// It allows for the other_detail column of the cats postgres table to be edited from the browser
 class Edit {
     constructor(cat) {
         this.cat = cat;
         this.div = this.createEditDiv();
     }
+    // Create a Div that pops up in the center of the screen to edit other details of the cat image in focus
     createEditDiv() {
         let div = document.createElement("div");
         div.setAttribute("id", "edit");
@@ -38,6 +41,7 @@ class Edit {
         div.style.backgroundColor = "#ADD8E6";
         console.log(this.cat);
         div.innerHTML = `<form onsubmit=\"return false;\"><label for=\"fname\">Edit the Other Details column for cat (see new updated copy from db in description):</label><br><textarea type=\"textarea\" id=\"edit-other-details\" name=\"edit-other-details\" value=\"${this.cat.other_details.slice(1)}\"></textarea><br><input style=\"font-size:24px;\"type=\"submit\" value=\"Submit\">`;
+        // Add a Button to close the Edit window 
         let close = document.createElement("input");
         close.setAttribute("id", "close-edit");
         close.setAttribute("class", "close-edit");
@@ -51,19 +55,22 @@ class Edit {
             (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
         });
         div.appendChild(close);
+        // On Submit, update the value 
         div.addEventListener("submit", () => __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             let val = document.getElementById("edit-other-details").value;
-            updateOtherDetailsColumn(parseInt(this.cat.id), val);
+            // In case of empty submission
             if (val.length === 0) {
                 div.innerText = "No changes.";
                 yield new Promise(r => setTimeout(r, 1000));
                 var elem = document.getElementById("edit");
                 (_a = elem === null || elem === void 0 ? void 0 : elem.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(elem);
             }
+            // Update Column in Postgres cats table
+            updateOtherDetailsColumn(parseInt(this.cat.id), val);
+            // 
             let updatedItem = yield fetchSingleItem(this.cat.id);
             let newCat = new Cat(updatedItem["id"], updatedItem["data"], updatedItem["breed_id"], updatedItem["breed_name"], updatedItem["other_details"]);
-            console.log(this.cat.id, this.cat, newCat.div);
             document.getElementById(this.cat.id).innerHTML = newCat.div.innerHTML;
             document.getElementById("description").innerHTML = newCat.description;
             div.innerText = "Updated Succesfully!";
