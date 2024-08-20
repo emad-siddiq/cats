@@ -3,6 +3,8 @@
 
 ![preview app](https://github.com/emad-siddiq/cats/blob/main/backend/static/img/preview.png)
 
+A small application CRUD enabled application to interact with [The Cats API](https://thecatapi.com/).
+
 1. Install [Docker](https://docs.docker.com/engine/install/) and [Python](https://www.python.org/downloads/) on your local machine. 
 
 2. Clone this repo and from the root run  `docker compose up -d`. 
